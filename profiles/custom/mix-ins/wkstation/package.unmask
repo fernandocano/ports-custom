@@ -1,0 +1,3 @@
+=sys-kernel/linux-headers-3.7
+=dev-util/gdbus-codegen-2.36.4-r1001
+>=dev-libs/libsigc++-2.6.2

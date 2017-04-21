@@ -1,0 +1,2 @@
+USE="logrotate bash-completion sasl crypt threads lm_sensors acpi curl fbcon caps xml udev lzma utils pam_krb5 keymap zlib kerberos lmdb"
+

@@ -1,0 +1,44 @@
+--- unixish.h	2010-11-21 21:40:59.000000000 +0000
++++ unixish2.h	2011-09-05 16:38:15.696759067 +0000
+@@ -27,7 +27,7 @@
+  *	This symbol, if defined, indicates that the routine utime() is
+  *	available to update the access and modification times of files.
+  */
+-#define HAS_UTIME		/**/
++/* #define HAS_UTIME		*/
+ 
+ /* HAS_GROUP
+  *	This symbol, if defined, indicates that the getgrnam() and
+--- installperl	2011-09-11 02:18:11.252795482 +0000
++++ installperl2	2011-09-11 02:40:28.558053957 +0000
+@@ -2,9 +2,9 @@
+ 
+ BEGIN {
+     require 5.004;
+-    chdir '..' if !-d 'lib' and -d '../lib';
+-    @INC = 'lib';
+-    $ENV{PERL5LIB} = 'lib';
++    chdir '..' if !-d 'xlib/' . $ENV{'CROSS_NAME'} and -d '../xlib/' . $ENV{'CROSS_NAME'};
++    @INC = ('lib','xlib/' . $ENV{'CROSS_NAME'});
++    $ENV{PERL5LIB} = join(':', @INC);
+ 
+     # This needs to be at BEGIN time, before any use of Config
+     require './install_lib.pl';
+@@ -245,7 +245,7 @@
+ 
+ if (!$Is_NetWare) {
+ if (!$Is_VMS) {
+--x 'perl' . $exe_ext	|| die "perl isn't executable!\n";
++-x 'perl' . $Config{_exe} . $exe_ext	|| die "perl isn't executable!\n";
+ }
+ else {
+ -x $ndbg . 'perl' . $exe_ext	|| die "${ndbg}perl$exe_ext isn't executable!\n";
+@@ -316,7 +316,7 @@
+ elsif ($^O ne 'dos') {
+     if (!$Is_NetWare) {
+ 	safe_unlink("$installbin/$perl_verbase$ver$exe_ext");
+-	copy("perl$exe_ext", "$installbin/$perl_verbase$ver$exe_ext");
++	copy("perl" . $Config{_exe} . $exe_ext, "$installbin/$perl_verbase$ver$exe_ext");
+ 	strip("$installbin/$perl_verbase$ver$exe_ext");
+ 	chmod(0755, "$installbin/$perl_verbase$ver$exe_ext");
+     }

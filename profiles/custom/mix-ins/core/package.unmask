@@ -1,0 +1,3 @@
+=dev-util/gdbus-codegen-2.36.3-r1000
+>=app-admin/eselect-guile-1.2-r1
+=net-firewall/iptables-1.6.0

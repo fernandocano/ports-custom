@@ -1,0 +1,581 @@
+diff -ru bperl-orig/Cross/README.new perl-34435/Cross/README.new
+--- bperl-orig/Cross/README.new	2008-09-20 01:04:03.000000000 +0400
++++ perl-34435/Cross/README.new	2008-09-29 04:21:40.000000000 +0400
+@@ -8,34 +8,16 @@
+ 
+ =head1 DESCRIPTION
+ 
+-This is second approach to linux cross-compilation, which should allow
++This is second approach to linux cross-compilation, which allows
+ building full perl and entensions for target platform. Cross-compilation
+-for linux uses similar approach and shares the same files as
+-cross-compilation for WinCE.
++for linux uses similar approach as cross-compilation for WinCE, and there
++are many similarities within generated files.
+ 
+-We refer to HOST as the platform where the build is performed, and to
+-TARGET as where final executables will run.
++We refer as HOST the platform where the build is performed, and the TARGET
++is where final executables will run.
+ 
+ =head2 Basic ideas
+ 
+-=head3 common
+-
+-Unlike WinCE, output files from GCC cross-compiler are produced in the same
+-directory where C files are. All TARGET binaries have different extensions
+-so to distinguish HOST and TARGET binaries. Namely, object files for C<arm>
+-cross-compilation will have extension C<.armo>, executable files will have
+-C<.arm>.
+-
+-After typical cross-compilation the following files will be built, among
+-others:
+-
+-  sv.c
+-  sv.o
+-  sv.armo
+-  libperl.arma
+-
+-(this approach may be reconsidered, however.)
+-
+ =head3 build process
+ 
+ C<miniperl> is built. This executable is intended to run on HOST, and it
+@@ -76,7 +58,11 @@
+ 
+ =head3 Tools & SDK
+ 
+-To compile, you need the following:
++To compile, you need native compiler (to build miniperl) and cross-compiler
++to build the entire perl.
++
++Look at the sample script C<build-arm-n770-sh> and its comments as an
++example how the cross-compiling environment could be established.
+ 
+ =over 4
+ 
+@@ -84,6 +70,24 @@
+ 
+ =back
+ 
++=head1 miscellaneous
++
++Unlike WinCE, output files from GCC cross-compiler are produced in the same
++directory where C files are. All TARGET binaries have different extensions
++so to distinguish HOST and TARGET binaries. Namely, object files for C<arm>
++cross-compilation will have extension C<.armo>, executable files will have
++C<.arm>.
++
++After typical cross-compilation the following files will be built, among
++others:
++
++  sv.c
++  sv.o
++  sv.armo
++  libperl.arma
++
++(this approach may be reconsidered, however.)
++
+ =head1 Things to be done
+ 
+ =over 4
+diff -ru bperl-orig/Cross/TODO perl-34435/Cross/TODO
+--- bperl-orig/Cross/TODO	2008-09-20 01:04:03.000000000 +0400
++++ perl-34435/Cross/TODO	2008-09-29 04:13:04.000000000 +0400
+@@ -1 +1,3 @@
+-Provide a better sandbox for building additional XS libraries.
++* construct automatic generation process of configs like ./Cross/config.sh-arm-linux-n770
++* generate object files in './xlib/xxx/' subdir?
++
+diff -ru bperl-orig/Cross/build-arm-n770-sh perl-34435/Cross/build-arm-n770-sh
+--- bperl-orig/Cross/build-arm-n770-sh	2008-09-20 01:04:03.000000000 +0400
++++ perl-34435/Cross/build-arm-n770-sh	2008-09-29 05:37:01.000000000 +0400
+@@ -1,13 +1,18 @@
+ # this is a build script for ARM-linux cross-compiling.
+-# it builds miniperl on HOST and then perl for TARGET
+-# this approach is like Perl-CE cross-compiling, and allows
++#
++# Cross-compiling SDK could be downloaded from the URL
++#   http://www.codesourcery.com/gnu_toolchains/arm
++#
++# SDK also could be downloaded from www.maemo.org, somehow (how - TBD)
++#
++# Cross-compile process similar to Perl-CE cross-compiling, and allows
+ # for full TARGET perl (as opposed to renamed miniperl)
+-
+-# to skip Configure/build for HOST miniperl, pass "noconf" argument to this script
+-
++#
+ # some trick is different, however - the file extension for objects files
+ # are choosen to be .${CROSS_NAME}, .armo in our case
+ 
++# to skip Configure/build for HOST miniperl, pass "noconf" argument to this script
++
+ # note how invoked Makefile.PL for cross-compilation:
+ #   miniperl -MCross Makefile.PL
+ 
+@@ -28,7 +33,8 @@
+ export CROSSCC
+ export CROSS_NAME
+ 
+-cp config.sh-arm-linux-n770 config-${CROSS_NAME}.sh
++# (re-)building this config-xxxx.sh is TBD
++cp config.sh-arm-linux-n770 ../config-${CROSS_NAME}.sh
+ 
+ # following should be done better:
+ cd ..
+@@ -38,50 +44,43 @@
+ CROSS_NAME= ./Configure -des -D prefix=./dummy -Dusedevel
+ make miniperl
+ make uudmap.h
+-# fake uudmap, which should be on HOST
+-# TODO - all host utilities should be clearly stated and not built for TARGET
+-cp generate_uudmap generate_uudmap.${CROSS_NAME}
+ fi
+ 
+-#?? cd Cross
+-
+ # do the rest for TARGET
+ $CROSSCC --version
+ 
+-# call make thusly so it will crosscompile...
++# call make this way so it will crosscompile...
+ XCOREDIR=xlib/$CROSS_NAME/CORE
+-PERL_CONFIG_SH=Cross/config-${CROSS_NAME}.sh
+-
+-#?? . $PERL_CONFIG_SH 
++PERL_CONFIG_SH=config-${CROSS_NAME}.sh
+ 
+ # make cflags do cross-compile work (now its hackish, will be improved!)
+ rm cflags-cross-$CROSS_NAME
+ cp Cross/cflags-cross-$CROSS_NAME .
+ rm Makefile-cross-$CROSS_NAME
+ CROSS_NAME=$CROSS_NAME sh Makefile.SH
+-cp Cross/Makefile-cross-$CROSS_NAME .
+ 
+ mkdir xlib
+ mkdir xlib/$CROSS_NAME
+ mkdir ${XCOREDIR}
+ 
+-#??OBJ_EXT=.${CROSS_NAME}o
+-# TODO these -- AR=${CCPREF}ar LD=${CCPREF}ld
+ cmd="make -f Makefile-cross-$CROSS_NAME xconfig.h"
+ echo "running $cmd"
+-$cmd
++$cmd || exit
+ 
+-echo "running $cmd"
+-cmd="make -f Makefile-cross-$CROSS_NAME libperl.${CROSS_NAME}a  OBJ_EXT=.${CROSS_NAME}o EXE_EXT=.$CROSS_NAME LIB_EXT=.${CROSS_NAME}a  AR=${CCPREF}ar LD=${CCPREF}ld"
+-$cmd
+ 
+-exit
+-
+-cmd="make -f Makefile-cross-$CROSS_NAME DynaLoader.${CROSS_NAME}o  OBJ_EXT=.${CROSS_NAME}o EXE_EXT=.$CROSS_NAME LIB_EXT=.${CROSS_NAME}a  AR=${CCPREF}ar LD=${CCPREF}ld"
+-echo "running $cmd"
+-$cmd
++#cmd="make -f Makefile-cross-$CROSS_NAME DynaLoader.${CROSS_NAME}o  OBJ_EXT=.${CROSS_NAME}o EXE_EXT=.$CROSS_NAME LIB_EXT=.${CROSS_NAME}a  AR=${CCPREF}ar LD=${CCPREF}ld"
++#echo "running $cmd"
++#$cmd || exit
++#
+ 
+-cmd="make -f Makefile-cross-$CROSS_NAME perl.${CROSS_NAME}"
++cmd="make -f Makefile-cross-$CROSS_NAME all"
+ echo "running $cmd"
+-$cmd
++$cmd || exit
+ 
++# extensions not currently built here:
++#  DB_File
++#  GDBM_File
++#  NDBM_File
++#  ODBM_File
++#  SDBM_File
++#
+diff -ru bperl-orig/Cross/cflags-cross-arm perl-34435/Cross/cflags-cross-arm
+--- bperl-orig/Cross/cflags-cross-arm	2008-09-20 01:04:03.000000000 +0400
++++ perl-34435/Cross/cflags-cross-arm	2008-09-29 03:52:33.000000000 +0400
+@@ -11,15 +11,15 @@
+ 
+ case $PERL_CONFIG_SH in
+ '')
+-	if test -f Cross/config-arm.sh; then TOP=.;
+-	elif test -f ../Cross/config-arm.sh; then TOP=..;
+-	elif test -f ../../Cross/config-arm.sh; then TOP=../..;
+-	elif test -f ../../../Cross/config-arm.sh; then TOP=../../..;
+-	elif test -f ../../../../Cross/config-arm.sh; then TOP=../../../..;
++	if test -f ./config-arm.sh; then TOP=.;
++	elif test -f ../config-arm.sh; then TOP=..;
++	elif test -f ../../config-arm.sh; then TOP=../..;
++	elif test -f ../../../config-arm.sh; then TOP=../../..;
++	elif test -f ../../../../config-arm.sh; then TOP=../../../..;
+ 	else
+ 		echo "Can't find config-arm.sh."; exit 1
+ 	fi
+-	. $TOP/Cross/config-arm.sh
++	. $TOP/config-arm.sh
+ 	;;
+ esac
+ 
+@@ -152,6 +152,6 @@
+     echo "$CROSSCC -c -DUSE_CROSS_COMPILE -DPERL_CORE $ccflags $stdflags $optimize $warn $extra"
+     eval "$also "'"$CROSSCC -DUSE_CROSS_COMPILE -DPERL_CORE -c $ccflags $stdflags $optimize $warn $extra"'
+ 
+-    . $TOP/Cross/config-arm.sh
++    . $TOP/config-arm.sh
+ 
+ done
+diff -ru bperl-orig/Cross/config.sh-arm-linux-n770 perl-34435/Cross/config.sh-arm-linux-n770
+--- bperl-orig/Cross/config.sh-arm-linux-n770	2008-09-20 01:04:03.000000000 +0400
++++ perl-34435/Cross/config.sh-arm-linux-n770	2008-09-29 03:52:33.000000000 +0400
+@@ -531,7 +531,7 @@
+ doublesize='8'
+ drand01='drand48()'
+ drand48_r_proto='0'
+-dynamic_ext='B ByteLoader Cwd Data/Dumper Devel/DProf Devel/PPPort Devel/Peek Digest/MD5 Encode Fcntl File/Glob Filter/Util/Call I18N/Langinfo IO IPC/SysV List/Util MIME/Base64 Opcode POSIX PerlIO/encoding PerlIO/scalar PerlIO/via SDBM_File Socket Storable Sys/Hostname Sys/Syslog Time/HiRes Unicode/Normalize XS/APItest XS/Typemap attrs re threads threads/shared'
++dynamic_ext='B Compress/Raw/Zlib Cwd Data/Dumper Devel/DProf Devel/PPPort Devel/Peek Digest/MD5 Digest/SHA Encode Fcntl File/Glob Filter/Util/Call Hash/Util I18N/Langinfo IO IPC/SysV List/Util MIME/Base64 Math/BigInt/FastCalc Opcode POSIX PerlIO/encoding PerlIO/scalar PerlIO/via Socket Storable Sys/Hostname Sys/Syslog Text/Soundex Time/HiRes Time/Piece Unicode/Normalize XS/APItest XS/Typemap attrs re threads threads/shared Hash/Util/FieldHash'
+ eagain='EAGAIN'
+ ebcdic='undef'
+ echo='echo'
+@@ -546,7 +546,7 @@
+ eunicefix=':'
+ exe_ext=''
+ expr='expr'
+-extensions='B ByteLoader Cwd Data/Dumper Devel/DProf Devel/PPPort Devel/Peek Digest/MD5 Encode Fcntl File/Glob Filter/Util/Call I18N/Langinfo IO IPC/SysV List/Util MIME/Base64 Opcode POSIX PerlIO/encoding PerlIO/scalar PerlIO/via SDBM_File Socket Storable Sys/Hostname Sys/Syslog Time/HiRes Unicode/Normalize XS/APItest XS/Typemap attrs re threads threads/shared Errno'
++extensions='B Compress/Raw/Zlib Cwd Data/Dumper Devel/DProf Devel/PPPort Devel/Peek Digest/MD5 Digest/SHA Encode Fcntl File/Glob Filter/Util/Call Hash/Util I18N/Langinfo IO IPC/SysV List/Util MIME/Base64 Math/BigInt/FastCalc Opcode POSIX PerlIO/encoding PerlIO/scalar PerlIO/via Socket Storable Sys/Hostname Sys/Syslog Text/Soundex Time/HiRes Time/Piece Unicode/Normalize XS/APItest XS/Typemap attrs re threads threads/shared Hash/Util/FieldHash Compress/Zlib Errno IO_Compress_Base IO_Compress_Zlib Module/Pluggable Test/Harness'
+ extras=''
+ fflushNULL='define'
+ fflushall='undef'
+@@ -736,7 +736,7 @@
+ ivdformat='"ld"'
+ ivsize='4'
+ ivtype='long'
+-known_extensions='B ByteLoader Cwd DB_File Data/Dumper Devel/DProf Devel/PPPort Devel/Peek Digest/MD5 Encode Fcntl File/Glob Filter/Util/Call GDBM_File I18N/Langinfo IO IPC/SysV List/Util MIME/Base64 NDBM_File ODBM_File Opcode POSIX PerlIO/encoding PerlIO/scalar PerlIO/via SDBM_File Socket Storable Sys/Hostname Sys/Syslog Time/HiRes Unicode/Normalize XS/APItest XS/Typemap attrs re threads threads/shared'
++known_extensions='B Compress/Raw/Zlib Cwd Data/Dumper Devel/DProf Devel/PPPort Devel/Peek Digest/MD5 Digest/SHA Encode Fcntl File/Glob Filter/Util/Call Hash/Util I18N/Langinfo IO IPC/SysV List/Util MIME/Base64 Math/BigInt/FastCalc Opcode POSIX PerlIO/encoding PerlIO/scalar PerlIO/via Socket Storable Sys/Hostname Sys/Syslog Text/Soundex Time/HiRes Time/Piece Unicode/Normalize Win32 Win32API/File Win32CORE XS/APItest XS/Typemap attrs re threads threads/shared Hash/Util/FieldHash'
+ ksh=''
+ ld='arm-none-linux-gnueabi-gcc'
+ lddlflags='-shared -L/usr/local/lib'
+@@ -943,7 +943,7 @@
+ ssizetype='ssize_t'
+ startperl='#!/usr/bin/perl'
+ startsh='#!/bin/sh'
+-static_ext='DynaLoader '
++static_ext=' '
+ stdchar='char'
+ stdio_base='((fp)->_IO_read_base)'
+ stdio_bufsiz='((fp)->_IO_read_end - (fp)->_IO_read_base)'
+diff -ru bperl-orig/MANIFEST perl-34435/MANIFEST
+--- bperl-orig/MANIFEST	2008-09-26 13:52:30.000000000 +0400
++++ perl-34435/MANIFEST	2008-09-29 03:52:33.000000000 +0400
+@@ -34,7 +34,6 @@
+ Cross/generate_config_sh	Cross-compilation
+ Cross/installperl.patch		Cross-compilation
+ Cross/Makefile		Cross-compilation
+-Cross/Makefile-cross-SH	Cross-compilation
+ Cross/Makefile.SH.patch	Cross-compilation
+ Cross/README		Cross-compilation
+ Cross/README.new	Cross-compilation
+diff -ru bperl-orig/Makefile.SH perl-34435/Makefile.SH
+--- bperl-orig/Makefile.SH	2008-09-20 01:04:03.000000000 +0400
++++ perl-34435/Makefile.SH	2008-09-29 03:52:33.000000000 +0400
+@@ -13,11 +13,23 @@
+ case $CROSS_NAME in
+ '')
+ 	Makefile=Makefile
++	make_ext=make_ext
++	utilities="utilities"
++	translators="translators"
++	MCROSS=""
+ 	;;
+ *)
+ 	# if cross-compilation, the Makefile named accordingly
+ 	Makefile=Makefile-cross-$CROSS_NAME
+-	. Cross/config-${CROSS_NAME}.sh
++	make_ext=make_ext_cross
++
++	# MCROSS is either empty or -MCross so proper TARGET machine config.pm
++	# will be activated
++	MCROSS="-MCross"
++	# cross-compiling of utilities (in utils), translators (in x2p) not yet here
++	utilities=""
++	translators=""
++	. config-${CROSS_NAME}.sh
+ 	;;
+ esac
+ 
+@@ -270,6 +282,7 @@
+ # These variables may need to be manually set for non-Unix systems.
+ AR = $full_ar
+ HOST_EXE_EXT = 
++HOST_OBJ_EXT = .o
+ EXE_EXT = $_exe
+ LIB_EXT = $_a
+ OBJ_EXT = $_o
+@@ -284,7 +297,7 @@
+ 
+ libs = $perllibs $cryptlib
+ 
+-public = perl\$(EXE_EXT) $suidperl utilities translators
++public = perl\$(EXE_EXT) $suidperl $utilities $translators
+ 
+ shellflags = $shellflags
+ 
+@@ -357,6 +370,10 @@
+ CONFIGPOD = lib/Config.pod
+ 
+ CONFIGH = config.h
++
++$(CONFIGPOD): config.sh miniperl$(EXE_EXT) configpm Porting/Glossary
++	$(LDLIBPTH) $(RUN) ./miniperl -Ilib configpm
++
+ !NO!SUBS!
+ 	;;
+ *)
+@@ -371,12 +388,20 @@
+ CONFIGPOD = xlib/\$(CROSS_NAME)/Config.pod
+ CONFIGH = xconfig.h
+ 
+-xconfig.h: config_h.SH Cross/config-\$(CROSS_NAME).sh
+-	CONFIG_SH=Cross/config-\$(CROSS_NAME).sh CONFIG_H=xconfig.h \$(SHELL) config_h.SH
++xconfig.h: config_h.SH config-\$(CROSS_NAME).sh
++	CONFIG_SH=config-\$(CROSS_NAME).sh CONFIG_H=xconfig.h \$(SHELL) config_h.SH
+ 	#TODO \$(LDLIBPTH) ./miniperl -Ilib -MCross=\$(CROSS_NAME) config_h.PL "INST_VER=\$(INST_VER)" "CORE_DIR=\$(CROSS_LIB)" "CONFIG_H=xconfig.h"
+ 	cp xconfig.h \$(CROSS_LIB)/
+ 	cp xconfig.h \$(CROSS_LIB)/config.h
+ 
++\$(CONFIGPM): config.sh miniperl configpm Porting/Glossary
++	\$(LDLIBPTH) ./miniperl -Ilib configpm --cross=\$(CROSS_NAME)
++	cp *.h \$(CROSS_LIB)/
++	cp ext/re/re.pm \$(CROSS_LIB)/
++
++\$(CONFIGPOD): config.sh miniperl\$(EXE_EXT) configpm Porting/Glossary
++	\$(LDLIBPTH) \$(RUN) ./miniperl -Ilib configpm --cross=\$(CROSS_NAME)
++
+ !GROK!THIS!
+ 	;;
+ esac
+@@ -552,8 +577,8 @@
+ uudmap.h: generate_uudmap\$(HOST_EXE_EXT)
+ 	\$(RUN) ./generate_uudmap\$(HOST_EXE_EXT) >uudmap.h
+ 
+-generate_uudmap\$(HOST_EXE_EXT): generate_uudmap\$(OBJ_EXT)
+-	\$(CC) -o generate_uudmap\$(EXE_EXT) \$(LDFLAGS) generate_uudmap\$(OBJ_EXT) \$(libs)
++generate_uudmap\$(HOST_EXE_EXT): generate_uudmap\$(HOST_OBJ_EXT)
++	\$(CC) -o generate_uudmap\$(HOST_EXE_EXT) \$(LDFLAGS) generate_uudmap\$(HOST_OBJ_EXT) \$(libs)
+ 
+ !GROK!THIS!
+ $spitshell >>$Makefile <<'!NO!SUBS!'
+@@ -561,7 +586,7 @@
+ 	$(CCCMD) $(PLDLFLAGS) $*.c
+ 
+ perlmain.c: miniperlmain.c config.sh $(FIRSTMAKEFILE)
+-	sh writemain $(DYNALOADER) $(static_ext) > perlmain.c
++	sh writemain DynaLoader $(static_ext) > perlmain.c
+ 
+ perlmain$(OBJ_EXT): perlmain.c
+ 	$(CCCMD) $(PLDLFLAGS) $*.c
+@@ -777,18 +802,18 @@
+ 
+ perl$(EXE_EXT): $& perlmain$(OBJ_EXT) $(LIBPERL) $(static_ext) ext.libs $(PERLEXPORT)
+ 	-@rm -f miniperl.xok
+-	$(SHRPENV) $(LDLIBPTH) $(CC) -o perl$(PERL_SUFFIX) $(PERL_PROFILE_LDFLAGS) $(CLDFLAGS) $(CCDLFLAGS) perlmain$(OBJ_EXT) $(static_ext) $(LLIBPERL) `cat ext.libs` $(libs)
++	$(SHRPENV) $(LDLIBPTH) $(CC) -o perl$(PERL_SUFFIX)$(EXE_EXT) $(PERL_PROFILE_LDFLAGS) $(CLDFLAGS) $(CCDLFLAGS) perlmain$(OBJ_EXT) $(static_ext) $(LLIBPERL) `cat ext.libs` $(libs)
+ 
+ # Purify/Quantify Perls.
+ 
+ pureperl$(EXE_EXT): $& perlmain$(OBJ_EXT) $(LIBPERL) $(static_ext) ext.libs $(PERLEXPORT)
+-	$(SHRPENV) $(LDLIBPTH) purify $(CC) -o pureperl $(CLDFLAGS) $(CCDLFLAGS) perlmain$(OBJ_EXT) $(static_ext) $(LLIBPERL) `cat ext.libs` $(libs)
++	$(SHRPENV) $(LDLIBPTH) purify $(CC) -o pureperl$(EXE_EXT) $(CLDFLAGS) $(CCDLFLAGS) perlmain$(OBJ_EXT) $(static_ext) $(LLIBPERL) `cat ext.libs` $(libs)
+ 
+ purecovperl$(EXE_EXT): $& perlmain$(OBJ_EXT) $(LIBPERL) $(static_ext) ext.libs $(PERLEXPORT)
+-	$(SHRPENV) $(LDLIBPTH) purecov $(CC) -o purecovperl $(CLDFLAGS) $(CCDLFLAGS) perlmain$(OBJ_EXT) $(static_ext) $(LLIBPERL) `cat ext.libs` $(libs)
++	$(SHRPENV) $(LDLIBPTH) purecov $(CC) -o purecovperl$(EXE_EXT) $(CLDFLAGS) $(CCDLFLAGS) perlmain$(OBJ_EXT) $(static_ext) $(LLIBPERL) `cat ext.libs` $(libs)
+ 
+ quantperl$(EXE_EXT): $& perlmain$(OBJ_EXT) $(LIBPERL) $(static_ext) ext.libs $(PERLEXPORT)
+-	$(SHRPENV) $(LDLIBPTH) quantify $(CC) -o quantperl $(CLDFLAGS) $(CCDLFLAGS) perlmain$(OBJ_EXT) $(static_ext) $(LLIBPERL) `cat ext.libs` $(libs)
++	$(SHRPENV) $(LDLIBPTH) quantify $(CC) -o quantperl$(EXE_EXT) $(CLDFLAGS) $(CCDLFLAGS) perlmain$(OBJ_EXT) $(static_ext) $(LLIBPERL) `cat ext.libs` $(libs)
+ 
+ # Valgrind perl (currently Linux only)
+ 
+@@ -906,34 +931,38 @@
+ !GROK!THIS!
+ ;;
+ *)
+-$spitshell >>$Makefile <<'!NO!SUBS!'
++$spitshell >>$Makefile <<!GROK!THIS!
+ .PHONY: makeppport
+-makeppport: miniperl$(EXE_EXT) $(CONFIGPM)
+-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib mkppport
++makeppport: miniperl\$(HOST_EXE_EXT) \$(CONFIGPM)
++	\$(LDLIBPTH) \$(RUN) ./miniperl\$(HOST_EXE_EXT) $MCROSS -Ilib mkppport
+ 
+-!NO!SUBS!
++!GROK!THIS!
+ ;;
+ esac
+ 
+-$spitshell >>$Makefile <<'!NO!SUBS!'
++$spitshell >>$Makefile <<!GROK!THIS!
++
++lib/lib.pm:	miniperl\$(EXE_EXT) \$(CONFIGPM)
++	@-rm -f \$@
++	\$(LDLIBPTH) \$(RUN) ./miniperl -Ilib $MCROSS lib/lib_pm.PL
+ 
+ # We have to call our ./makedir because Ultrix 4.3 make can't handle the line
+ #	test -d lib/auto || mkdir lib/auto
+ # We need to autosplit in two steps because VOS can't handle so many args
+ #
+ .PHONY: preplibrary
+-preplibrary: miniperl$(EXE_EXT) $(CONFIGPM) lib/lib.pm $(PREPLIBRARY_LIBPERL)
++preplibrary: miniperl\$(EXE_EXT) \$(CONFIGPM) lib/lib.pm \$(PREPLIBRARY_LIBPERL)
+ 	@sh ./makedir lib/auto
+ 	@echo "	AutoSplitting perl library"
+-	$(LDLIBPTH) $(RUN) ./miniperl -Ilib -MAutoSplit -MFile::Find -e ' \
++	\$(LDLIBPTH) \$(RUN) ./miniperl -Ilib $MCROSS -MAutoSplit -MFile::Find -e ' \
+ 		find ({no_chdir=>1, wanted => \
+-		       sub {autosplit_lib_modules($$_) if /\.pm$$/}}, \
++		       sub {autosplit_lib_modules(\$\$_) if /\.pm\$\$/}}, \
+ 		      "lib")'
+-	$(MAKE) lib/re.pm
++	\$(MAKE) lib/re.pm
+ 
+-$(CONFIGPOD): config.sh miniperl$(EXE_EXT) configpm Porting/Glossary
+-	$(LDLIBPTH) $(RUN) ./miniperl -Ilib configpm
++!GROK!THIS!
+ 
++$spitshell >>$Makefile <<'!NO!SUBS!'
+ $(CONFIGPM): $(CONFIGPOD)
+ 
+ lib/ExtUtils/Miniperl.pm: miniperlmain.c miniperl$(EXE_EXT) minimod.pl $(CONFIGPM)
+@@ -950,10 +979,6 @@
+ x2p/s2p: miniperl$(EXE_EXT) $(CONFIGPM) x2p/s2p.PL
+ 	cd x2p; $(LDLIBPTH) $(MAKE) s2p
+ 
+-lib/lib.pm:	miniperl$(EXE_EXT) $(CONFIGPM)
+-	@-rm -f $@
+-	$(LDLIBPTH) $(RUN) ./miniperl -Ilib lib/lib_pm.PL
+-
+ unidatafiles $(unidatafiles): uni.data
+ 
+ uni.data: miniperl$(EXE_EXT) $(CONFIGPM) lib/unicore/mktables
+@@ -1113,18 +1138,22 @@
+ #
+ # DynaLoader may be needed for extensions that use Makefile.PL.
+ 
+-$(DYNALOADER):	miniperl$(EXE_EXT) preplibrary FORCE
+-	@$(LDLIBPTH) sh ext/util/make_ext $(STATIC) $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL)
++!NO!SUBS!
+ 
+-d_dummy $(dynamic_ext):	miniperl$(EXE_EXT) preplibrary makeppport $(DYNALOADER) FORCE
+-	@$(LDLIBPTH) sh ext/util/make_ext dynamic $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL)
++$spitshell >>$Makefile <<!GROK!THIS!
++\$(DYNALOADER):	miniperl preplibrary FORCE
++	@\$(LDLIBPTH) sh ext/util/$make_ext \$(STATIC) \$@ MAKE=\$(MAKE) LIBPERL_A=\$(LIBPERL)
+ 
+-s_dummy $(static_ext):	miniperl$(EXE_EXT) preplibrary makeppport $(DYNALOADER) FORCE
+-	@$(LDLIBPTH) sh ext/util/make_ext $(STATIC) $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL)
++d_dummy \$(dynamic_ext):	miniperl preplibrary makeppport \$(DYNALOADER) FORCE
++	@\$(LDLIBPTH) sh ext/util/$make_ext dynamic \$@ MAKE=\$(MAKE) LIBPERL_A=\$(LIBPERL)
+ 
+-n_dummy $(nonxs_ext):	miniperl$(EXE_EXT) preplibrary FORCE
+-	@$(LDLIBPTH) sh ext/util/make_ext nonxs $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL)
+-!NO!SUBS!
++s_dummy \$(static_ext):	miniperl preplibrary makeppport \$(DYNALOADER) FORCE
++	@\$(LDLIBPTH) sh ext/util/$make_ext \$(STATIC) \$@ MAKE=\$(MAKE) LIBPERL_A=\$(LIBPERL)
++
++n_dummy \$(nonxs_ext):	miniperl preplibrary FORCE
++	@\$(LDLIBPTH) sh ext/util/$make_ext nonxs \$@ MAKE=\$(MAKE) LIBPERL_A=\$(LIBPERL)
++
++!GROK!THIS!
+ 
+ $spitshell >>$Makefile <<EOF
+ $extra_dep
+diff -ru bperl-orig/configpm perl-34435/configpm
+--- bperl-orig/configpm	2008-09-20 01:04:03.000000000 +0400
++++ perl-34435/configpm	2008-09-29 03:52:33.000000000 +0400
+@@ -94,7 +94,7 @@
+   mkdir "xlib/$Opts{cross}";
+   $Config_PM = "xlib/$Opts{cross}/Config.pm";
+   $Config_POD = "xlib/$Opts{cross}/Config.pod";
+-  $Config_SH = "Cross/config-$Opts{cross}.sh";
++  $Config_SH = "config-$Opts{cross}.sh";
+ }
+ else {
+   $Config_PM = "lib/Config.pm";
+diff -ru bperl-orig/ext/POSIX/Makefile.PL perl-34435/ext/POSIX/Makefile.PL
+--- bperl-orig/ext/POSIX/Makefile.PL	2008-09-20 01:04:09.000000000 +0400
++++ perl-34435/ext/POSIX/Makefile.PL	2008-09-29 03:52:33.000000000 +0400
+@@ -1,6 +1,6 @@
+ # Explicitly avoid including '.' in @INC; autoloader gets confused since it
+ # can find POSIX.pm, but can't find autosplit.ix.
+-BEGIN { @INC = '../../lib';}
++BEGIN { @INC = '../../lib' unless defined $Cross::platform;}
+ #
+ use ExtUtils::MakeMaker;
+ use ExtUtils::Constant 0.11 'WriteConstants';
+diff -ru bperl-orig/lib/ExtUtils/MM_Unix.pm perl-34435/lib/ExtUtils/MM_Unix.pm
+--- bperl-orig/lib/ExtUtils/MM_Unix.pm	2008-09-20 01:04:11.000000000 +0400
++++ perl-34435/lib/ExtUtils/MM_Unix.pm	2008-09-29 03:52:33.000000000 +0400
+@@ -146,7 +146,7 @@
+ 	$command -S $flags \$*.c
+ 
+ .c\$(OBJ_EXT):
+-	$command $flags \$*.c
++	$command $flags -o \$*\$(OBJ_EXT) \$*.c
+ 
+ .cpp\$(OBJ_EXT):
+ 	$command $flags \$*.cpp
+@@ -2583,7 +2583,7 @@
+     my $newer_than_target = $Is{VMS} ? '$(MMS$SOURCE_LIST)' : '$?';
+     my $mpl_args = join " ", map qq["$_"], @ARGV;
+ 
+-    $m .= sprintf <<'MAKE_FRAG', $newer_than_target, $mpl_args;
++    $m .= sprintf <<'MAKE_FRAG', $newer_than_target, $mpl_args unless defined $Cross::platform;
+ # We take a very conservative approach here, but it's worth it.
+ # We move Makefile to Makefile.old here to avoid gnu make looping.
+ $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
+@@ -2788,19 +2788,30 @@
+     my($self) = shift;
+     my(@m);
+ 
++    my $configsh = "config.sh";
+     my $make_config = $self->cd('$(PERL_SRC)', '$(MAKE) lib/Config.pm');
+ 
+-    push @m, sprintf <<'MAKE_FRAG', $make_config if $self->{PERL_SRC};
++    if (defined $Cross::platform) {
++	# in cross-compiling the dependant config.sh contains cross-identifier
++	# in its name, yet Config.pm is located in ./xlib/xxxx/
++	$make_config = $self->cd('$(PERL_SRC)', "\$(MAKE) xlib/$Cross::platform/Config.pm");
++	$configsh = "config-$Cross::platform.sh";
++    }
++
++    if ($self->{PERL_SRC}) {
++	push @m, "CONFIGSH = \$(PERL_SRC)/$configsh\n";
++	push @m, sprintf <<'MAKE_FRAG', $make_config;
+ # Check for unpropogated config.sh changes. Should never happen.
+ # We do NOT just update config.h because that is not sufficient.
+ # An out of date config.h is not fatal but complains loudly!
+-$(PERL_INC)/config.h: $(PERL_SRC)/config.sh
+-	-$(NOECHO) $(ECHO) "Warning: $(PERL_INC)/config.h out of date with $(PERL_SRC)/config.sh"; false
++$(PERL_INC)/config.h: $(CONFIGSH)
++	-$(NOECHO) $(ECHO) "Warning: $(PERL_INC)/config.h out of date with $(CONFIGSH)"; false
+ 
+-$(PERL_ARCHLIB)/Config.pm: $(PERL_SRC)/config.sh
+-	$(NOECHO) $(ECHO) "Warning: $(PERL_ARCHLIB)/Config.pm may be out of date with $(PERL_SRC)/config.sh"
++$(PERL_ARCHLIB)/Config.pm: $(CONFIGSH)
++	$(NOECHO) $(ECHO) "Warning: $(PERL_ARCHLIB)/Config.pm may be out of date with $(CONFIGSH)"
+ 	%s
+ MAKE_FRAG
++    }
+ 
+     return join "", @m unless $self->needs_linking;
+ 
+@@ -3716,7 +3727,7 @@
+     '
+ .xs$(OBJ_EXT):
+ 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $*.xs > $*.xsc && $(MV) $*.xsc $*.c
+-	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) $*.c
++	$(CCCMD) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) -o $*$(OBJ_EXT) $*.c
+ ';
+ }
+ 
+

@@ -1,0 +1,10 @@
+--- gcc-5.3.0/Makefile.in	2015-03-25 07:05:22.000000000 -0500
++++ gcc-5.3.0/Makefile.in2	2017-01-15 23:22:53.566120738 -0600
+@@ -169,6 +169,7 @@
+ # built for the build system to override those in BASE_FLAGS_TO_PASS.
+ EXTRA_BUILD_FLAGS = \
+ 	CFLAGS="$(CFLAGS_FOR_BUILD)" \
++	CXXFLAGS="$(CXXFLAGS_FOR_BUILD)" \
+ 	LDFLAGS="$(LDFLAGS_FOR_BUILD)"
+ 
+ # This is the list of directories to built for the host system.

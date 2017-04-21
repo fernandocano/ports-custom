@@ -1,0 +1,38 @@
+#!/sbin/openrc-run
+# Copyright 1999-2017 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+PIDFILE=/var/run/${RC_SVCNAME}.pid
+
+: ${MUKSVC_USER:=muksvc}
+: ${MUKSVC_GROUP:=muksvc}
+: ${CMD_ARGS:="-hp 8082"}
+
+depend() {
+	use logger net
+}
+
+start() {
+	ebegin "Starting ${RC_SVCNAME}"
+
+	start-stop-daemon  --start \
+		--quiet --background \
+		--user ${MUKSVC_USER}:${MUKSVC_GROUP} \
+		--make-pidfile --pidfile ${PIDFILE} \
+		--exec /opt/bin/muksvc \
+		-- \
+			${CMD_ARGS}
+
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping '${RC_SVCNAME}'"
+
+	start-stop-daemon --stop \
+		--quiet --retry=60 \
+		--pidfile ${PIDFILE} \
+		--exec /opt/bin/muksvc
+
+	eend $?
+}

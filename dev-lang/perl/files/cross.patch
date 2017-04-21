@@ -1,0 +1,27 @@
+--- Configure	2011-09-02 21:20:35.321521648 +0000
++++ Configure2	2011-09-02 21:22:28.791644800 +0000
+@@ -2895,7 +2895,6 @@
+ EOF
+ 	    ;;
+ 	*)  echo "Unknown targetrun '$targetrun'" >&4
+-	    exit 1
+ 	    ;;
+ 	esac
+ 	case "$targetmkdir" in
+@@ -2907,7 +2906,6 @@
+ 	    $chmod a+rx $targetmkdir
+ 	    ;;
+ 	*)  echo "Unknown targetmkdir '$targetmkdir'" >&4
+-	    exit 1
+ 	    ;;
+ 	esac
+ 	case "$targetto" in
+@@ -5366,7 +5364,7 @@
+ and I got the following output:
+ 
+ EOM
+-dflt=y
++dflt=n
+ if $sh -c "$cc -o try $optimize $ccflags $ldflags try.c $libs" >>try.msg 2>&1; then
+ 	if $sh -c "$run ./try " >>try.msg 2>&1; then
+ 		xxx=`$run ./try`

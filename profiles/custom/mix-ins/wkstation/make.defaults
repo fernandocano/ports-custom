@@ -1,0 +1,2 @@
+USE="gpm ldap vim-syntax X xorg xcomposite nsplugin webstart cups ppds dbus gtk qt4 fontconfig imagemagick opengl exif gif jpeg svg png mng cairo ffmpeg mpeg mp3 mp4 mad dts dvd dvdr dvb a52 aac flac ogg vorbis theora v4l pvr libnotify wifi tiff vaapi truetype alsa introspection gudev pdf fam lcms unicode xcb x264 spell usbredir glamor xkb jce"
+

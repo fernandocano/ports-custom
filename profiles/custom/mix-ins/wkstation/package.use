@@ -1,0 +1,32 @@
+dev-util/cscope emacs
+dev-db/tora oci8-instant-client
+x11-libs/libdrm libkms
+x11-wm/stumpwm clisp emacs
+x11-misc/cairo-dock xcomposite
+media-libs/libpng apng
+media-libs/mesa gles2
+media-libs/libmypaint gegl
+media-libs/libvpx svc
+media-video/mpv libass lua xscreensaver
+app-admin/conky imlib lua lua-cairo lua-imlib math
+dev-vcs/subversion java webdav-serf
+dev-java/swing-layout source
+dev-java/oracle-jdk-bin source javafx
+dev-java/icedtea-bin source
+app-emulation/qemu-kvm sdl
+dev-qt/qtsql mysql
+x11-libs/qt-sql oci8 mysql
+net-misc/openvpn passwordsave examples
+net-misc/openssh -ldap
+media-video/ffmpeg opus
+dev-libs/libgcrypt -caps
+dev-libs/libdbusmenu gtk3
+net-misc/spice-gtk gtk3
+net-libs/gtk-vnc gtk3
+net-fs/cifs-utils -acl
+net-dns/dnsmasq script
+dev-java/bsf -python
+dev-java/ant-apache-bsf -python
+dev-java/junit source
+x11-wm/compiz-fusion emerald unsupported
+x11-plugins/pidgin-sipe voice

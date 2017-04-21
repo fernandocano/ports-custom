@@ -1,0 +1,4 @@
+app-crypt/mit-krb5 xinetd
+sys-apps/xinetd tcpd
+dev-vcs/subversion -kerberos webdav-serf
+net-misc/openssh -ldap

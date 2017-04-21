@@ -1,0 +1,7 @@
+#
+# muksvc config
+#
+
+MUKSVC_USER=muksvc
+MUKSVC_GROUP=muksvc
+CMD_ARGS="-hp 8082"
