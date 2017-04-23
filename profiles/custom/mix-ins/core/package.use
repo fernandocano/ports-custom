@@ -7,7 +7,7 @@ net-print/hplip qt4 snmp -acl
 net-print/foomatic-filters -cups
 net-print/cups -filters -java
 net-dns/bind dlz
-app-editors/emacs xft 
+app-editors/emacs xft
 media-libs/libjpeg-turbo -java
 sys-fs/cryptsetup -static
 sys-fs/eudev static-libs
@@ -15,3 +15,4 @@ dev-db/tora mysql
 dev-libs/libusbx -udev
 dev-libs/openssl -kerberos
 mail-client/mutt -berkdb -gdbm -tokyocabinet
+www-servers/apache proxy proxy_http proxy_ajp
