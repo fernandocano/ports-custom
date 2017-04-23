@@ -15,7 +15,7 @@ IUSE=""
 DEPEND="net-libs/nodejs[npm]"
 
 RDEPEND="${DEPEND}
-	www-servers/apache[apache2_modules_proxy,apache2_mdoules_proxy_http,apache2_modules_proxy_ajp]"
+	www-servers/apache[apache2_modules_proxy,apache2_modules_proxy_http,apache2_modules_proxy_ajp]"
 
 src_configure() {
 	econf \

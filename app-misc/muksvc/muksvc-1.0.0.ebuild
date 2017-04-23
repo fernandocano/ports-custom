@@ -15,7 +15,7 @@ IUSE=""
 DEPEND=""
 RDEPEND="${DEPEND}
 	www-servers/tomcat
-	www-servers/apache[apache2_modules_proxy,apache2_mdoules_proxy_http,apache2_modules_proxy_ajp]
+	www-servers/apache[apache2_modules_proxy,apache2_modules_proxy_http,apache2_modules_proxy_ajp]
 	dev-db/couchdb
 	>net-nds/openldap-2.4.35
 	net-misc/curl"
