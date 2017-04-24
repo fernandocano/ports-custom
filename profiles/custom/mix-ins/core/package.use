@@ -15,4 +15,4 @@ dev-db/tora mysql
 dev-libs/libusbx -udev
 dev-libs/openssl -kerberos
 mail-client/mutt -berkdb -gdbm -tokyocabinet
-www-servers/apache apache2_modules_proxy papache2_modules_proxy_http apache2_modules_proxy_ajp
+www-servers/apache apache2_modules_proxy apache2_modules_proxy_http apache2_modules_proxy_ajp
