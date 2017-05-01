@@ -4,7 +4,7 @@
 
 #spring_profiles: mysql,default
 #spring_profiles: postgresql,default
-spring_profiles: ldap,default,hsqldb
+#spring_profiles: ldap,default,hsqldb
 #spring_profiles: saml
 #spring_profiles: keystone,default,hsqldb
 
@@ -70,15 +70,15 @@ spring_profiles: ldap,default,hsqldb
 #    url: http://localhost:35357/v2.0/tokens
 #    url: http://localhost:5000/v3/auth/tokens
 
-ldap:
-  profile:
-    file: ldap/ldap-simple-bind.xml
-  base:
-    url: 'ldap://127.0.0.1:10636/'
-    userDnPattern: 'cn={0},ou=Users,dc=winduponthewater,dc=com;cn={0},ou=OtherUsers,dc=winduponthewater,dc=com'
+#ldap:
+#  profile:
+#    file: ldap/ldap-simple-bind.xml
+#  base:
+#    url: 'ldaps://192.168.3.39:10636/'
+#    userDnPattern: 'cn={0},ou=Users,dc=test,dc=com;cn={0},ou=OtherUsers,dc=example,dc=com'
 #  ssl:
 #    skipverification: false
-#   sslCertificate: ! '-----BEGIN CERTIFICATE-----
+#    sslCertificate: ! '-----BEGIN CERTIFICATE-----
 #    MIIBfTCCAScCBgFDfaC2yzANBgkqhkiG9w0BAQUFADBCMQswCQYDVQQGEwJVUzEMMAoGA1UEChMD
 #    QVNGMRIwEAYDVQQLEwlEaXJlY3RvcnkxETAPBgNVBAMTCEFwYWNoZURTMB4XDTE0MDExMDE5Mjg0
 #    MVoXDTE1MDExMDE5Mjg0MVowTDELMAkGA1UEBhMCVVMxDDAKBgNVBAoTA0FTRjESMBAGA1UECxMJ
@@ -93,21 +93,13 @@ ldap:
 #    - user
 #  emailDomain:
 #    - example.com
-  attributeMappings:
-    given_name: givenname
-    family_name: sn
-    phone_number: telephonenumber
-    user.attribute.employeeCostCenter: costCenter
-    user.attribute.terribleBosses: uaaManager
-  providerDescription: 'Human readable description of this provider'
-  groups:
-      file: 'ldap/ldap-groups-map-to-scopes.xml'
-      searchBase: 'dc=winduponthewater,dc=com'
-      groupSearchFilter: 'member={0}'
-      searchSubtree: true
-      maxSearchDepth: 10
-      autoAdd: true
-      ignorePartialResultException: true
+#  attributeMappings:
+#    given_name: givenname
+#    family_name: sn
+#    phone_number: telephonenumber
+#    user.attribute.employeeCostCenter: costCenter
+#    user.attribute.terribleBosses: uaaManager
+#  providerDescription: 'Human readable description of this provider'
 
 
 #ldap:
@@ -202,8 +194,9 @@ oauth:
       scope: openid
       authorities: password.write,scim.userids,uaa.resource,scim.read
       id: mukapi
+      secret: umkay!
       resource-ids: none
-      redirect-uri: http://www.winduponthewater.com/api/admin/tokenLogin
+      redirect-uri: http://localhost:8082/proxied/api/admin/tokenLogin
 
 # Default token signing key. Each installation MUST provide a unique key
 # in order for tokens to be usable only on that installation.
