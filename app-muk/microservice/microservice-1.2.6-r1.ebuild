@@ -38,7 +38,7 @@ src_prepare() {
 		${S}/gradle/config/buildConfig.groovy
 
 	sed -i \
-		-e "/gradlew epack/ s#\$# --no-daemon --gradle-user-home=\"${WORKDIR}\"#" \
+		-e "/gradlew epack/ s#WORKDIR#${WORKDIR}#" \
 		Makefile.am
 	
 	eautoreconf
@@ -51,7 +51,7 @@ src_configure() {
 }
 
 src_install() {
-	dodir "/opt/bin"
+	dodir "/opt"
 
 	emake DESTDIR="${D}" install
 
@@ -62,13 +62,18 @@ pkg_preinst() {
 	enewgroup muksvc
 	enewuser muksvc -1 -1 /dev/null "muksvc"
 
+	sed -e "/^CONF_BASE/ s#CONF_BASE=.*#CONF_BASE=\"/opt/${P}\"#" ${FILESDIR}/muksvc.confd > ${FILESDIR}/muksvc2.confd
+
 	# install init.d service
-	newconfd ${FILESDIR}/muksvc.confd muksvc
+	newconfd ${FILESDIR}/muksvc2.confd muksvc
 	newinitd ${FILESDIR}/muksvc.initd muksvc
+
+	rm ${FILESDIR}/muksvc2.confd
 
 	insinto /opt/${P}
 	doins ${FILESDIR}/uaa.yml
 	doins ${FILESDIR}/appkeystore.jceks
+	doins ${FILESDIR}/security.properties
 
 	insinto /etc/tomcat-9
 	doins ${FILESDIR}/tomcat-users.xml
