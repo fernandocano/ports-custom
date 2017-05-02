@@ -8,6 +8,7 @@ inherit autotools
 DESCRIPTION="muk microservices - a restful api"
 HOMEPAGE="https://winduponthewater.com/muk/"
 SRC_URI="https://github.com/fernandocano/microservice/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+export GRADLE_OPTS="-Dgradle.user.home=\"${WORKDIR}\""
 
 LICENSE="GPL-3"
 SLOT="1"
@@ -37,7 +38,7 @@ src_prepare() {
 		${S}/gradle/config/buildConfig.groovy
 
 	sed -i \
-		-e "/gradlew epack/ s#\$# --gradle-user-home \"${WORKDIR}\"#" \
+		-e "/gradlew epack/ s#\$# --no-daemon --gradle-user-home=\"${WORKDIR}\"#" \
 		Makefile.am
 	
 	eautoreconf
@@ -47,6 +48,14 @@ src_configure() {
 	econf \
 		--prefix=/opt \
 		--enable-debug=no
+}
+
+src_install() {
+	dodir "/opt/bin"
+
+	emake DESTDIR="${D}" install
+
+	einstalldocs
 }
 
 pkg_preinst() {
