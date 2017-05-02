@@ -4,4 +4,9 @@
 
 MUKSVC_USER=muksvc
 MUKSVC_GROUP=muksvc
+
+# custom configuration location for *.properties overrides
+CONF_BASE=
+
+# http(s) port that embedded jetty listen to
 CMD_ARGS="-hp 8082"
