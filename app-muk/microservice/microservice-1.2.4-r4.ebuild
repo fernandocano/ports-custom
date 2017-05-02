@@ -3,7 +3,7 @@
 
 EAPI=6
 
-inherit autotools
+inherit autotools user
 
 DESCRIPTION="muk microservices - a restful api"
 HOMEPAGE="https://winduponthewater.com/muk/"
@@ -50,14 +50,21 @@ src_configure() {
 		--enable-debug=no
 }
 
+src_install() {
+	dodir "/opt/bin"
+
+	emake DESTDIR="${D}" install
+
+	einstalldocs
+}
 
 pkg_preinst() {
 	enewgroup muksvc
-	enewuser muksvc -1 /sbin/nologin /dev/null "muksvc"
+	enewuser muksvc -1 -1 /dev/null "muksvc"
 
 	# install init.d service
-	newconfd ${FILESDIR}/muksvc.confd
-	newinitd ${FILESDIR}/muksvc.initd
+	newconfd ${FILESDIR}/muksvc.confd muksvc
+	newinitd ${FILESDIR}/muksvc.initd muksvc
 
 	insinto /opt/${P}
 	doins ${FILESDIR}/uaa.yml
