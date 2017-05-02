@@ -3,9 +3,12 @@
 
 EAPI=6
 
+inherit autotools user
+
 DESCRIPTION="muk microservices - a restful api"
 HOMEPAGE="https://winduponthewater.com/muk/"
 SRC_URI="https://github.com/fernandocano/microservice/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+export GRADLE_OPTS="-Dgradle.user.home=\"${WORKDIR}\""
 
 LICENSE="GPL-3"
 SLOT="1"
@@ -20,10 +23,39 @@ RDEPEND="${DEPEND}
 	>net-nds/openldap-2.4.35
 	net-misc/curl"
 
+src_prepare() {
+	if declare -p PATCHES | grep -q "^declare -a "; then
+		[[ -n ${PATCHES[@]} ]] && eapply "${PATCHES[@]}"
+	else
+		[[ -n ${PATCHES} ]] && eapply ${PATCHES}
+	fi
+	eapply_user
+
+	mkdir ${S}/services/src/main/resources
+
+	sed -i \
+		-e  "/prod {\$/,\$ { /keystorefile/ s/'[^']*'/'\/opt\/${P}\/appkeystore.jceks'/ }"   \
+		${S}/gradle/config/buildConfig.groovy
+
+	sed -i \
+		-e "/gradlew epack/ s#\$# --no-daemon --gradle-user-home=\"${WORKDIR}\"#" \
+		Makefile.am
+	
+	eautoreconf
+}
+
 src_configure() {
 	econf \
 		--prefix=/opt \
 		--enable-debug=no
+}
+
+src_install() {
+	dodir "/opt/bin"
+
+	emake DESTDIR="${D}" install
+
+	einstalldocs
 }
 
 pkg_preinst() {
@@ -31,11 +63,12 @@ pkg_preinst() {
 	enewuser muksvc -1 /sbin/nologin /dev/null "muksvc"
 
 	# install init.d service
-	newconfd ${FILESDIR}/muksvc.confd
-	newinitd ${FILESDIR}/muksvc.initd
+	newconfd ${FILESDIR}/muksvc.confd muksvc
+	newinitd ${FILESDIR}/muksvc.initd muksvc
 
 	insinto /opt/${P}
 	doins ${FILESDIR}/uaa.yml
+	doins ${FILESDIR}/appkeystore.jceks
 
 	insinto /etc/tomcat-9
 	doins ${FILESDIR}/tomcat-users.xml
