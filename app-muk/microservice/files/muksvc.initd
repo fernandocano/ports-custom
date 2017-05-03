@@ -6,6 +6,7 @@ PIDFILE=/var/run/${RC_SVCNAME}.pid
 
 : ${MUKSVC_USER:=muksvc}
 : ${MUKSVC_GROUP:=muksvc}
+: ${CMD_EXEC:="/opt/bin/broken"}
 : ${CMD_ARGS:="-hp 8082"}
 
 depend() {
@@ -19,7 +20,7 @@ start() {
 		--quiet --background \
 		--user ${MUKSVC_USER}:${MUKSVC_GROUP} \
 		--make-pidfile --pidfile ${PIDFILE} \
-		--exec /opt/bin/muksvc \
+		--exec ${CMD_EXEC} \
 		-- \
 			${CMD_ARGS}
 
@@ -32,7 +33,7 @@ stop() {
 	start-stop-daemon --stop \
 		--quiet --retry=60 \
 		--pidfile ${PIDFILE} \
-		--exec /opt/bin/muksvc
+		--exec ${CMD_EXEC}
 
 	eend $?
 }

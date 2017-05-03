@@ -10,3 +10,6 @@ CONF_BASE=
 
 # http(s) port that embedded jetty listen to
 CMD_ARGS="-hp 8082"
+
+# executable
+CMD_EXEC=
