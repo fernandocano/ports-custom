@@ -62,11 +62,13 @@ pkg_preinst() {
 	enewgroup muksvc
 	enewuser muksvc -1 -1 /dev/null "muksvc"
 
-	sed -i -e "/^CONF_BASE/ s#CONF_BASE=.*#CONF_BASE=\"/opt/${P}\"#" ${FILESDIR}/muksvc.confd
-
 	# install init.d service
 	newconfd ${FILESDIR}/muksvc.confd muksvc
 	newinitd ${FILESDIR}/muksvc.initd muksvc
+
+	sed -i \
+		-e "/^CONF_BASE/ s#CONF_BASE=.*#CONF_BASE=\"/opt/${P}\"#" \
+		-e "/^CMD_EXEC/ s#CMD_EXEC=.*#CMD_EXEC=\"/opt/${P}/bin/${PN}\"#" ${ED}/etc/conf.d/muksvc
 
 	insinto /opt/${P}
 	doins ${FILESDIR}/uaa.yml
