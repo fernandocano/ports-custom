@@ -35,6 +35,7 @@ src_prepare() {
 
 	sed -i \
 		-e  "/prod {\$/,\$ { /keystorefile/ s/'[^']*'/'\/opt\/${P}\/appkeystore.jceks'/ }"   \
+		-e  "/prod {\$/,\$ { /logging/ s/'[^']*'/'\/var\/log\/${PN}'/ }"   \
 		${S}/gradle/config/buildConfig.groovy
 
 	sed -i \
@@ -47,11 +48,14 @@ src_prepare() {
 src_configure() {
 	econf \
 		--prefix=/opt \
-		--enable-debug=no
+		--enable-debug=no \
+		--localstatedir=/var/lib
 }
 
 src_install() {
 	dodir "/opt"
+	keepdir /var/lib/${PN}
+	keepdir /var/log/${PN}
 
 	emake DESTDIR="${D}" install
 
@@ -60,7 +64,11 @@ src_install() {
 
 pkg_preinst() {
 	enewgroup muksvc
-	enewuser muksvc -1 -1 /dev/null "muksvc"
+	enewuser muksvc -1 -1 /var/lib/${PN} "muksvc"
+
+	fowners muksvc:muksvc \
+		/var/lib/${PN} \
+		/var/log/${PN}
 
 	# install init.d service
 	newconfd ${FILESDIR}/muksvc.confd muksvc
