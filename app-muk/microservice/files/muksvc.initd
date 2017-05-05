@@ -19,6 +19,7 @@ start() {
 	start-stop-daemon  --start \
 		--quiet --background \
 		--user ${MUKSVC_USER}:${MUKSVC_GROUP} \
+		--chdir /var/lib/microservice \
 		--make-pidfile --pidfile ${PIDFILE} \
 		--exec ${CMD_EXEC} \
 		-- \
