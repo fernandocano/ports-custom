@@ -15,7 +15,8 @@ IUSE=""
 DEPEND="net-libs/nodejs[npm]"
 
 RDEPEND="${DEPEND}
-	www-servers/apache[apache2_modules_proxy,apache2_modules_proxy_http,apache2_modules_proxy_ajp]"
+	www-servers/apache[apache2_modules_proxy,apache2_modules_proxy_http,apache2_modules_proxy_ajp]
+	app-misc/jq"
 
 src_prepare() {
 if declare -p PATCHES | grep -q "^declare -a "; then
@@ -41,7 +42,7 @@ if declare -p PATCHES | grep -q "^declare -a "; then
 src_configure() {
 	econf \
 		--prefix=/var/www/winduponthewater.com/htdocs \
-		NODE_ENV=production
+		--enable-debug=no
 
 	einfo "Install minimal npm packages"
 	npm install
