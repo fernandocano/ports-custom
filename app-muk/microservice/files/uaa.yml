@@ -328,3 +328,78 @@ oauth:
 #        - PUT
 #        - POST
 #        - DELETE
+
+login:
+  # Enable create account and forgot password links on the Login Server (enabled by default)
+  #selfServiceLinksEnabled: true
+  #base URL that the login server can be reached at
+#  oauth:
+#    providers:
+#      my-oauth-provider:
+#        type: oauth2.0
+#        authUrl: http://my-auth.com
+#        tokenUrl: http://my-token.com
+#        tokenKey: my-token-key
+#        tokenKeyUrl:
+#        issuer: token issuer (iss)
+#        scopes:
+#          - openid
+#          - scope.example
+#        emailDomain:
+#          - example.com
+#        linkText: My Oauth Provider
+#        showLinkText: true
+#        addShadowUserOnLogin: false
+#        relyingPartyId: uaa
+#        relyingPartySecret: secret
+#        attributeMappings:
+#          given_name: firstName
+#          family_name: lastname
+#          user_name: username
+#          external_groups:
+#            - scopes_example_group
+#            - roles_example_group
+  url: http://localhost:8080/uaa
+#  idpDiscoveryEnabled: true
+#  accountChooserEnabled: true
+
+  # SAML Key Configuration
+  # The location and credentials of the certificate for this SP
+  # See README.md for details on how to create this.
+  serviceProviderKey: |
+    -----BEGIN RSA PRIVATE KEY-----
+    MIICXgIBAAKBgQCvK4fdeq116jNqiT84pYkY9d0oMfhuPe53FUkXw0nLzlNWVtqr
+    MvvNHzbmjlAJKXbRgEmk/UhWCnahqpI5klUReMLRuIHujewQ3OCkPZKUNwzrbppn
+    iTqlKknQc5xMmiP/677xCgJmfoKZmNcTgd7ofx+7N0BN2R1ctSLcajO62wIDAQAB
+    AoGBAIaHjATQ3r8cavh7B47dsvj0ejEQj5c7ARV7x3L0jIx1nRNGCRJKSZAzVNqk
+    mVsv+QzU1bpcu105E/r9IOgONj26Hcbk7w+lKDSVkXzUsqPRLoy/OrgoWEniilM6
+    P9TxsvYiHRo0je3fhH4W4KBE/E/sX2Dme7OfYT+I2+OnjKXhAkEA6O1uq8GItO+8
+    WEklIZOMrTXLyFiZSZXPXajT96SZ+xy9vA/RqaIpc55J50C+zcvmNuGtt8LVh+Tq
+    QAcuR1w7zQJBAMCFfMCCXP8XqjOg/EKX25gmrsmEeqLDE6Iq/0TBms9T4NnKsDQV
+    mdlCMeRAqa0ILkjloJUNexvz/fOoCYIIuUcCQQDQkxP/7wx4YRg5wj3ipBpbXAm/
+    vD5/GwwWJUCxx44uw1zPEyc+jDwsEPjCgEKbS9M5H7sMCwZkasKsVQHG2rudAkAI
+    kCdrXKEMS54ra7ass5p12wqdNgJKaQjfhrAR+9aJ8D4pEcXimy9bpYEYmPOzGZEN
+    dwE8f/wA00pxYwEBQqgTAkEA12gIxtBzXUEWHP35amy9pccFiUppErwC1Lc0pnzP
+    oEOzf/tQIBDXeMJ+7Zn1nMkgH7pyYgCXQXZcF5Ke3FkTiQ==
+    -----END RSA PRIVATE KEY-----
+  serviceProviderKeyPassword:
+  serviceProviderCertificate: |
+    -----BEGIN CERTIFICATE-----
+    MIIC6jCCAlOgAwIBAgIJAM9HDvxuQwKPMA0GCSqGSIb3DQEBCwUAMIGNMQswCQYD
+    VQQGEwJVUzELMAkGA1UECAwCVFgxDzANBgNVBAcMBkF1c3RpbjEVMBMGA1UECgwM
+    bWl6dXVlbmlrYXplMR8wHQYDVQQDDBYqLndpbmR1cG9udGhld2F0ZXIuY29tMSgw
+    JgYJKoZIhvcNAQkBFhlpbmZvQHdpbmR1cG9udGhld2F0ZXIuY29tMB4XDTE3MDUw
+    NzAxNDcyMloXDTE4MDUwNzAxNDcyMlowgY0xCzAJBgNVBAYTAlVTMQswCQYDVQQI
+    DAJUWDEPMA0GA1UEBwwGQXVzdGluMRUwEwYDVQQKDAxtaXp1dWVuaWthemUxHzAd
+    BgNVBAMMFioud2luZHVwb250aGV3YXRlci5jb20xKDAmBgkqhkiG9w0BCQEWGWlu
+    Zm9Ad2luZHVwb250aGV3YXRlci5jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJ
+    AoGBAK8rh916rXXqM2qJPziliRj13Sgx+G497ncVSRfDScvOU1ZW2qsy+80fNuaO
+    UAkpdtGASaT9SFYKdqGqkjmSVRF4wtG4ge6N7BDc4KQ9kpQ3DOtummeJOqUqSdBz
+    nEyaI//rvvEKAmZ+gpmY1xOB3uh/H7s3QE3ZHVy1ItxqM7rbAgMBAAGjUDBOMB0G
+    A1UdDgQWBBS38DhYbz9jc8BbCtsYzDHtEDSdoDAfBgNVHSMEGDAWgBS38DhYbz9j
+    c8BbCtsYzDHtEDSdoDAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBCwUAA4GBAF9z
+    Sfl0AFsjGBskyaoa2lZmei3tbHToZ/l4o7YKMygcBEJud4oWRObtjajZdPU6rU0s
+    vxe0QkugasSPKx4F+o0untW/RAuzqs5n3gAe7sUAurYKl6lMxPddN/flC+i78k4J
+    DJ5kBHL2Fr0NsGzcskRxkmjkcGSdHc5dqcEpvqlV
+    -----END CERTIFICATE-----
+
