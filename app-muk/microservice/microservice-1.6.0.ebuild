@@ -36,6 +36,7 @@ src_prepare() {
 	sed -i \
 		-e  "/prod {\$/,\$ { /keystorefile/ s/'[^']*'/'\/opt\/${P}\/appkeystore.jceks'/ }"   \
 		-e  "/prod {\$/,\$ { /logging/ s/'[^']*'/'\/var\/log\/${PN}'/ }"   \
+		-e  "/prod {\$/,\$ { /server/ s/'[^']*'/'http:\/\/localhost:8080/uaa'/ }"   \
 		${S}/gradle/config/buildConfig.groovy
 
 	sed -i \
@@ -80,7 +81,6 @@ pkg_preinst() {
 
 	insinto /opt/${P}
 	doins ${FILESDIR}/uaa.yml
-	doins ${FILESDIR}/appkeystore.jceks
 	doins ${FILESDIR}/security.properties
 
 	insinto /etc/tomcat-9

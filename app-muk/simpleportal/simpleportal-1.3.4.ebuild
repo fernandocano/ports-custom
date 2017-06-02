@@ -3,9 +3,9 @@
 
 EAPI=6
 
-DESCRIPTION="siteww - ampersand frontend"
+DESCRIPTION="mukportal - ampersand frontend"
 HOMEPAGE="https://winduponthewater.com/muk/"
-SRC_URI="https://github.com/fernandocano/contentsiteww/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/fernandocano/simpleportal/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="MIT"
 SLOT="1"
@@ -31,7 +31,6 @@ if declare -p PATCHES | grep -q "^declare -a "; then
 	sed -i \
 		-e "/browserify/d" \
 		-e "/express/d" \
-		-e "/bootstrap.native/d" \
 		-e "/helmet/d" \
 		-e "/cookie-parser/d" \
 		-e "/body-parser/d" \

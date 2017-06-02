@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="project">
+    <email>fcanocollab@gmail.com</email>
+    <name>Fernando Cano</name>
+  </maintainer>
+  <longdescription>
+    Contentsiteww is an ampersand frontend portal for winduponthewater massage.
+  </longdescription>
+</pkgmetadata>
