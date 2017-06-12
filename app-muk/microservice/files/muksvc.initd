@@ -8,9 +8,12 @@ PIDFILE=/var/run/${RC_SVCNAME}.pid
 : ${MUKSVC_GROUP:=muksvc}
 : ${CMD_EXEC:="/opt/bin/broken"}
 : ${CMD_ARGS:="-hp 8082"}
+: ${CONF_BASE:="/opt/unknown"}
 
 depend() {
 	use logger net
+	need apache2
+	after apache2
 }
 
 start() {
@@ -21,6 +24,7 @@ start() {
 		--user ${MUKSVC_USER}:${MUKSVC_GROUP} \
 		--chdir /var/lib/microservice \
 		--make-pidfile --pidfile ${PIDFILE} \
+		--env CONF_BASE=${CONF_BASE} \
 		--exec ${CMD_EXEC} \
 		-- \
 			${CMD_ARGS}

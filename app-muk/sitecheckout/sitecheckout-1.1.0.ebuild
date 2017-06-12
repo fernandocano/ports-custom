@@ -3,9 +3,9 @@
 
 EAPI=6
 
-DESCRIPTION="mukportal - ampersand frontend"
+DESCRIPTION="sitecheckout - ampersand frontend for checkout flows"
 HOMEPAGE="https://winduponthewater.com/muk/"
-SRC_URI="https://github.com/fernandocano/simpleportal/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/fernandocano/sitecheckout/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="MIT"
 SLOT="1"
@@ -15,7 +15,7 @@ IUSE=""
 DEPEND="net-libs/nodejs[npm]"
 
 RDEPEND="${DEPEND}
-	www-servers/apache[apache2_modules_proxy,apache2_modules_proxy_http,apache2_modules_proxy_ajp]
+	www-servers/apache[apache2_modules_proxy,apache2_modules_proxy_http,apache2_modules_proxy_ajp,apache2_modules_substitute]
 	app-misc/jq"
 
 src_prepare() {
