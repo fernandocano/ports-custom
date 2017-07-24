@@ -27,15 +27,7 @@ if declare -p PATCHES | grep -q "^declare -a "; then
 	eapply_user
 
 	mkdir ${S}/artifacts
-
-	sed -i \
-		-e "/browserify/d" \
-		-e "/express/d" \
-		-e "/helmet/d" \
-		-e "/cookie-parser/d" \
-		-e "/body-parser/d" \
-		-e "/semi-static/d" \
-		-e "/serve-static/d" package.json
+	cp ${FILESDIR}/package.json ${S}/.
 }
 
 src_configure() {
