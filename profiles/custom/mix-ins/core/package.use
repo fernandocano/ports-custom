@@ -1,5 +1,6 @@
 dev-libs/libxml2 python
 dev-libs/cyrus-sasl sample
+dev-libs/libpcre2 pcre16
 sys-libs/zlib minizip
 x11-libs/cairo drm gallium
 net-fs/nfs-utils nfsidmap

@@ -21,6 +21,7 @@ net-misc/openssh -ldap
 media-video/ffmpeg opus
 dev-libs/libgcrypt -caps
 dev-libs/libdbusmenu gtk3
+dev-libs/xmlsec nss
 net-misc/spice-gtk gtk3
 net-libs/gtk-vnc gtk3
 net-fs/cifs-utils -acl
@@ -30,3 +31,6 @@ dev-java/ant-apache-bsf -python
 dev-java/junit source
 x11-wm/compiz-fusion emerald unsupported
 x11-plugins/pidgin-sipe voice
+dev-db/oracle-instantclient jdbc
+app-i18n/ibus -emoji -gtk2
+app-i18n/mozc emacs ibus fcitx4

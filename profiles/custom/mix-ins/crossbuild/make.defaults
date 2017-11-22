@@ -1,2 +1,0 @@
-USE="-X gtk qt4 imagemagick opengl exif gif jpeg svg png mng cairo ffmpeg mpeg mp3 mp4 mad dts tiff introspection gudev pdf fam lcms unicode"
-
