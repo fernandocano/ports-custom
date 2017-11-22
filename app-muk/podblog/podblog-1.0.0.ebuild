@@ -3,9 +3,9 @@
 
 EAPI=6
 
-DESCRIPTION="sitecheckout - ampersand frontend for checkout flows"
+DESCRIPTION="podblog - ampersand blog frontend"
 HOMEPAGE="https://winduponthewater.com/muk/"
-SRC_URI="https://github.com/fernandocano/sitecheckout/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/fernandocano/podblog/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="MIT"
 SLOT="1"
@@ -27,15 +27,7 @@ if declare -p PATCHES | grep -q "^declare -a "; then
 	eapply_user
 
 	mkdir ${S}/artifacts
-
-	sed -i \
-		-e "/browserify/d" \
-		-e "/express/d" \
-		-e "/helmet/d" \
-		-e "/cookie-parser/d" \
-		-e "/body-parser/d" \
-		-e "/semi-static/d" \
-		-e "/serve-static/d" package.json
+	cp ${FILESDIR}/package.json ${S}/.
 }
 
 src_configure() {

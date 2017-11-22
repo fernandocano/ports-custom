@@ -3,9 +3,9 @@
 
 EAPI=6
 
-DESCRIPTION="siteww - ampersand frontend"
+DESCRIPTION="mukportal - ampersand frontend"
 HOMEPAGE="https://winduponthewater.com/muk/"
-SRC_URI="https://github.com/fernandocano/contentsiteww/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/fernandocano/simpleportal/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="MIT"
 SLOT="1"
@@ -27,15 +27,7 @@ if declare -p PATCHES | grep -q "^declare -a "; then
 	eapply_user
 
 	mkdir ${S}/artifacts
-
-	sed -i \
-		-e "/browserify/d" \
-		-e "/express/d" \
-		-e "/helmet/d" \
-		-e "/cookie-parser/d" \
-		-e "/body-parser/d" \
-		-e "/semi-static/d" \
-		-e "/serve-static/d" package.json
+	cp ${FILESDIR}/package.json ${S}/.
 }
 
 src_configure() {
