@@ -3,9 +3,9 @@
 
 EAPI=6
 
-DESCRIPTION="sitecheckout - ampersand frontend for checkout flows"
+DESCRIPTION="mukportal - ampersand frontend"
 HOMEPAGE="https://winduponthewater.com/muk/"
-SRC_URI="https://github.com/fernandocano/sitecheckout/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/fernandocano/simpleportal/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="MIT"
 SLOT="1"

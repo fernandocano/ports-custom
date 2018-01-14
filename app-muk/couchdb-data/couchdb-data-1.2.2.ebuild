@@ -24,3 +24,7 @@ src_configure() {
 		--prefix=/opt \
 		--enable-debug=no
 }
+
+# no op since there is nothing to install
+# Install seems to force another make all
+src_install() { :; }
